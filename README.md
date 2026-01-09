@@ -100,6 +100,33 @@ A modern, secure notes sharing platform built for friends to collaborate and org
    npm start
    ```
 
+## Deployment
+
+### Deploy to Vercel (Recommended)
+
+This application is configured for easy deployment to Vercel:
+
+1. **Quick Deploy**
+   - Push your code to GitHub
+   - Import project to Vercel (https://vercel.com/new)
+   - Add environment variables (see DEPLOYMENT.md)
+   - Deploy!
+
+2. **Environment Variables Required**
+   ```
+   NODE_ENV=production
+   JWT_SECRET=your-secret-key-minimum-32-characters
+   JWT_EXPIRE=7d
+   DATABASE_URL=postgresql://user:password@host:port/database
+   CLIENT_URL=https://your-app.vercel.app
+   ```
+
+3. **Database Setup**
+   - Use Vercel Postgres, or
+   - Use external provider (Neon, Supabase, Railway)
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
 ## Project Structure
 
 ```

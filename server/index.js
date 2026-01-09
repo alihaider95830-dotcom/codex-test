@@ -11,15 +11,18 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.CLIENT_URL || 'http://localhost:5173',
+    origin: process.env.CLIENT_URL || '*',
     methods: ['GET', 'POST'],
   },
 });
 
 // Middleware
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false, // Disable for development, configure properly in production
+}));
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: process.env.CLIENT_URL || '*',
   credentials: true,
 }));
 app.use(express.json());
@@ -67,8 +70,8 @@ app.set('io', io);
 app.set('userSockets', userSockets);
 
 // Health check
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // Error handling
@@ -77,13 +80,22 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: 'Something went wrong!' });
 });
 
-// Initialize database and start server
-const PORT = process.env.PORT || 5000;
-
+// Initialize database
 syncDatabase().then(() => {
+  console.log('Database synced successfully');
+}).catch(err => {
+  console.error('Database sync failed:', err);
+});
+
+// For Vercel serverless deployment
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  // For local development
+  const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
   });
-});
+}
 
-module.exports = { app, io };
+module.exports = app;
