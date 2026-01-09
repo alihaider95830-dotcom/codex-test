@@ -12,11 +12,28 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // TESTING MODE: Auto-login with mock user (disable authentication)
+  const TESTING_MODE = true;
+
+  const mockUser = {
+    id: 'test-user-1',
+    username: 'TestUser',
+    email: 'test@example.com',
+    avatar: null,
+    theme: 'light',
+  };
+
+  const [user, setUser] = useState(TESTING_MODE ? mockUser : null);
+  const [loading, setLoading] = useState(TESTING_MODE ? false : true);
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
+    if (TESTING_MODE) {
+      setUser(mockUser);
+      setLoading(false);
+      return;
+    }
+
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       fetchUser();
